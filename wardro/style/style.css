@@ -131,8 +131,6 @@ header img{
     position: fixed;
     bottom: 0;
     left: 0;
-    padding-top: 1vh;
-    padding-bottom: 1vh;
     width: 100vw;
     height: 80px;
     background: rgba(0, 0, 0, 0.95);
@@ -146,14 +144,14 @@ header img{
 
 .nav-dots {
     display: flex;
-    gap: 0.2vh;
+    gap: 2vw;
     align-items: center;
     justify-content: center;
 }
 
 .dot {
-    width: 0.2vh;
-    height: 0.2vh;
+    width: 1vh;
+    height: 1vh;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -162,8 +160,8 @@ header img{
 
 .dot.active {
     background-color: #ffffff;
-    width: 0.3vh;
-    height: 0.3vh;
+    width: 1.5vh;
+    height: 1.5vh;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
