@@ -290,6 +290,13 @@ function showPreview(canvas) {
     canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         previewImg.src = url;
+        // ensure the preview container is empty and the image is inside it
+        preview.innerHTML = '';
+        preview.appendChild(previewImg);
+        // force sizing and scaling to fit the box
         previewImg.style.display = 'block';
+        previewImg.style.width = '100%';
+        previewImg.style.height = '100%';
+        previewImg.style.objectFit = 'contain';
     });
 }

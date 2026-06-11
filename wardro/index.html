@@ -8,6 +8,8 @@
     <script src="./javaScript/script.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-segmentation@2.2.0"></script>
+    <script src="./javaScript/supabase.js" defer></script>
+    <script src="./javaScript/auth.js" defer></script>
     <link rel="apple-touch-icon" href="media/imgs/appIcon.png">
 </head>
 <body>
@@ -44,13 +46,40 @@
             </div>
         </div>
 
-        <!-- Page 2: Profil -->
-        <div class="page page-2" id="page-2">
-            <div class="page-content">
-                <h1>Profil</h1>
-                <p>Profil Seite</p>
-            </div>
-        </div>
+                <!-- Page 2: Profil (Auth UI) -->
+                <div class="page page-2" id="page-2">
+                        <div class="page-content">
+                                <h1>Profil</h1>
+
+                                <main class="auth-page-inline">
+                                    <section class="auth-box" id="profileAuthBox">
+                                        <h2 id="authTitle">Login</h2>
+                                        <form id="authForm">
+                                            <label for="identifier">Benutzername oder E‑Mail</label>
+                                            <input id="identifier" name="identifier" type="text" autocomplete="username" required>
+
+                                            <label for="password">Passwort</label>
+                                            <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+                                            <div class="avatar-row">
+                                                <div id="avatarPreview" class="avatar-preview" title="Profilbild ändern"></div>
+                                                <input id="avatarInput" type="file" accept="image/*" capture="user" style="display:none">
+                                            </div>
+
+                                            <button id="submitBtn" type="submit">Login</button>
+                                        </form>
+
+                                        <div class="auth-switch">
+                                            <span id="switchText">Noch keinen Account?</span>
+                                            <button id="switchBtn">Registrieren</button>
+                                        </div>
+
+                                        <div id="authMessage" class="auth-message" role="status" aria-live="polite"></div>
+                                    </section>
+                                </main>
+
+                        </div>
+                </div>
     </div>
 
     <!-- Footer -->

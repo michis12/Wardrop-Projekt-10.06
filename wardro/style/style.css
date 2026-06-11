@@ -269,3 +269,21 @@ header img{
     transform: translateY(-3px);
     background: rgba(255,255,255,0.12);
 }
+
+/* Auth page styles */
+.auth-page{display:flex;align-items:flex-start;justify-content:center;padding:40px 0;background:transparent}
+.auth-box{width:min(420px,92vw);background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:26px;border-radius:14px;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+.auth-box h2{margin:0 0 18px 0;text-align:center;font-size:1.25rem}
+.auth-box label{display:block;font-size:0.9rem;margin-top:12px;color:rgba(255,255,255,0.85)}
+.auth-box input[type=text],.auth-box input[type=password]{width:100%;padding:12px;margin-top:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;font-size:1rem}
+.auth-box button[type=submit]{width:100%;margin-top:18px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:#ffffff;color:#000;font-weight:700;cursor:pointer;font-size:1rem}
+.auth-switch{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:14px}
+.auth-switch button{background:none;border:0;color:#ffffff;cursor:pointer}
+.avatar-row{display:flex;align-items:center;gap:14px;margin-top:14px}
+.avatar-preview{width:88px;height:88px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-size:24px}
+.avatar-label{font-size:0.95rem}
+.auth-message{margin-top:12px;text-align:center}
+
+/* logged-in info */
+.logged-in-info{margin-top:12px;text-align:center;color:#fff}
+.logged-in-info button{margin-top:8px;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;cursor:pointer}
