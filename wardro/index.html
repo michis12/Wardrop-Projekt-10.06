@@ -23,13 +23,8 @@
                 <h1>Add Item</h1>
                 <div class="upload-container">
                     <input type="file" id="imageInput" accept="image/*">
-                    <div class="upload-box" id="uploadBox">
-                        <p>Bild hochladen</p>
-                        <small>Klicken oder Bild einfügen</small>
-                        <div class="upload-actions">
-                            <button type="button" id="galleryBtn">Galerie</button>
-                            <button type="button" id="cameraBtn">Kamera</button>
-                        </div>
+                    <div class="upload-box" id="uploadBox" role="button" aria-label="Bild hochladen - öffnet Galerie">
+                        <!-- Klick öffnet die Galerie -->
                     </div>
                     <canvas id="processCanvas" style="display:none;"></canvas>
                     <img id="processedImage" style="display:none;" alt="Verarbeitetes Bild">

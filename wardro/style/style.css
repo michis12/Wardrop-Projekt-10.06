@@ -119,7 +119,10 @@ header img{
 .page-content {
     padding: 20px;
     color: #ffffff;
+    text-align: center;
+    justify-content: center;
 }
+
 
 /* Footer Navigation */
 .page-footer {
@@ -170,7 +173,6 @@ header img{
     height: auto;
     animation: fadeIn 2s ease-in-out;
     margin-top: 5vh;
-    margin-left: 35vw;
     transition: all 0.3s ease;
 }
 #bp_1:hover,
@@ -196,7 +198,7 @@ header img{
 
 .upload-box {
     width: 66.66%;
-    height: 70vh;
+    height: 60vh;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 20px;
