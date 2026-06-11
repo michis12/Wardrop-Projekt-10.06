@@ -102,3 +102,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, 50);
 });
+function bodyTouched(pageIndex) {
+    const bp = document.getElementById('bp_1');
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
+    
+    // Toggle active state
+    bp.classList.toggle('active');
+    leftBtn.classList.toggle('show');
+    rightBtn.classList.toggle('show');
+}
