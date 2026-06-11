@@ -21,14 +21,12 @@
   function setAvatarPlaceholder(){
     avatarPreview.innerHTML = '';
     avatarPreview.style.backgroundImage = '';
-    const icon = document.createElement('div');
-    icon.textContent = '📷';
-    icon.style.fontSize = '28px';
-    icon.style.opacity = '0.9';
-    avatarPreview.appendChild(icon);
+    avatarPreview.classList.add('placeholder');
   }
 
   avatarPreview.addEventListener('click', ()=>{
+    // only allow uploading when in register mode
+    if (mode !== 'register') return;
     avatarInput.click();
   });
 
@@ -48,6 +46,18 @@
   // initialize placeholder if empty
   if (avatarPreview && avatarPreview.innerHTML.trim() === '') setAvatarPlaceholder();
 
+  // show/hide avatar preview depending on mode
+  function updateAvatarVisibility(){
+    if (mode === 'register'){
+      avatarPreview.style.display = 'flex';
+    } else {
+      avatarPreview.style.display = 'none';
+    }
+  }
+
+  // ensure initial visibility
+  updateAvatarVisibility();
+
   switchBtn.addEventListener('click', (e)=>{
     e.preventDefault();
     if (mode === 'login'){
@@ -65,7 +75,22 @@
       switchBtn.textContent = 'Registrieren';
     }
     setMessage('', false);
+    // show/hide registration-specific inputs and avatar
+    const regFields = document.getElementById('regFields');
+    const loginIdentifier = document.getElementById('loginIdentifier');
+    if (regFields && loginIdentifier){
+      if (mode === 'register'){
+        regFields.style.display = 'block';
+        loginIdentifier.style.display = 'none';
+      } else {
+        regFields.style.display = 'none';
+        loginIdentifier.style.display = 'block';
+      }
+    }
+    updateAvatarVisibility();
   });
+
+  // previously used MutationObserver; now updateAvatarVisibility is called directly after mode switch
 
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -74,13 +99,21 @@
     const password = document.getElementById('password').value;
     const avatarFile = avatarInput.files[0];
 
-    if (!identifier || !password){ setMessage('Bitte alle Felder ausfüllen.', true); return; }
+    if (mode === 'register'){
+      // require username and email for registration
+      const regUsername = document.getElementById('reg_username').value.trim();
+      const regEmail = document.getElementById('reg_email').value.trim();
+      if (!regUsername || !regEmail || !password){ setMessage('Bitte Benutzername, E‑Mail und Passwort angeben.', true); return; }
+    } else {
+      if (!identifier || !password){ setMessage('Bitte Benutzername/E‑Mail und Passwort angeben.', true); return; }
+    }
 
     try {
       if (mode === 'register'){
-        // allow username or email — if username (no @) create fake email
-        const email = identifier.includes('@') ? identifier : `${identifier}@wardrop.local`;
-        const { data, error } = await db.auth.signUp({ email, password }, { data: { username: identifier } });
+        // read username + email from reg fields
+        const regUsername = document.getElementById('reg_username').value.trim();
+        const regEmail = document.getElementById('reg_email').value.trim();
+        const { data, error } = await db.auth.signUp({ email: regEmail, password }, { data: { username: regUsername } });
         if (error) throw error;
         if (data && data.user){
           // upload avatar if present

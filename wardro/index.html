@@ -49,22 +49,34 @@
                 <!-- Page 2: Profil (Auth UI) -->
                 <div class="page page-2" id="page-2">
                         <div class="page-content">
-                                <h1>Profil</h1>
+                                
 
                                 <main class="auth-page-inline">
                                     <section class="auth-box" id="profileAuthBox">
                                         <h2 id="authTitle">Login</h2>
                                         <form id="authForm">
-                                            <label for="identifier">Benutzername oder E‑Mail</label>
-                                            <input id="identifier" name="identifier" type="text" autocomplete="username" required>
+                                            <div class="avatar-row">
+                                                <div id="avatarPreview" class="avatar-preview" title="Profilbild ändern" aria-hidden="true"></div>
+                                                <input id="avatarInput" type="file" accept="image/*" capture="user" style="display:none">
+                                            </div>
+
+                                                                                        <!-- Registration-only fields (hidden by default) -->
+                                                                                        <div class="reg-fields" id="regFields" style="display:none">
+                                                                                            <label for="reg_username">Benutzername</label>
+                                                                                            <input id="reg_username" name="reg_username" type="text" autocomplete="username">
+
+                                                                                            <label for="reg_email">E‑Mail</label>
+                                                                                            <input id="reg_email" name="reg_email" type="email" autocomplete="email">
+                                                                                        </div>
+
+                                                                                        <!-- Login identifier (visible by default) -->
+                                                                                        <div id="loginIdentifier">
+                                                                                            <label for="identifier">Benutzername oder E‑Mail</label>
+                                                                                            <input id="identifier" name="identifier" type="text" autocomplete="username">
+                                                                                        </div>
 
                                             <label for="password">Passwort</label>
                                             <input id="password" name="password" type="password" autocomplete="current-password" required>
-
-                                            <div class="avatar-row">
-                                                <div id="avatarPreview" class="avatar-preview" title="Profilbild ändern"></div>
-                                                <input id="avatarInput" type="file" accept="image/*" capture="user" style="display:none">
-                                            </div>
 
                                             <button id="submitBtn" type="submit">Login</button>
                                         </form>
