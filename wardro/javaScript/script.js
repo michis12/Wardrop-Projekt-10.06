@@ -119,18 +119,41 @@ function bodyTouched(pageIndex) {
 document.addEventListener('DOMContentLoaded', () => {
     const uploadBox = document.getElementById('uploadBox');
     const imageInput = document.getElementById('imageInput');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const galleryBtn = document.getElementById('galleryBtn');
     
-    // Click on box to open file input
+    // Click on box opens gallery by default
     uploadBox.addEventListener('click', () => {
+        if (imageInput.hasAttribute('capture')) imageInput.removeAttribute('capture');
         imageInput.click();
     });
     
+    // Camera button: set capture then open
+    if (cameraBtn) {
+        cameraBtn.addEventListener('click', () => {
+            imageInput.setAttribute('capture', 'environment');
+            imageInput.click();
+        });
+    }
+    
+    // Gallery button: ensure no capture and open
+    if (galleryBtn) {
+        galleryBtn.addEventListener('click', () => {
+            if (imageInput.hasAttribute('capture')) imageInput.removeAttribute('capture');
+            imageInput.click();
+        });
+    }
+
     // Handle file selection
     imageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             handleImageUpload(file);
         }
+        // Reset capture so subsequent picks default to gallery
+        if (imageInput.hasAttribute('capture')) imageInput.removeAttribute('capture');
+        // Clear value to allow re-selecting same file later
+        imageInput.value = '';
     });
     
     // Drag and drop
