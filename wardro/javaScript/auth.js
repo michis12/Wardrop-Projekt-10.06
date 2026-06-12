@@ -10,6 +10,46 @@
   const avatarPreview = document.getElementById('avatarPreview');
 
   let mode = 'login'; // or 'register'
+  const RATE_LIMIT_MS = 5 * 60 * 1000; // 5 minutes cooldown for email rate limit
+
+  function getRateLimitUntil(){
+    const v = sessionStorage.getItem('auth_rate_limit_until');
+    return v ? parseInt(v,10) : 0;
+  }
+
+  function setRateLimitUntil(ts){
+    sessionStorage.setItem('auth_rate_limit_until', String(ts));
+  }
+
+  let rateLimitTimer = null;
+  function startRateLimitCountdown(){
+    clearInterval(rateLimitTimer);
+    const until = getRateLimitUntil();
+    if (!until || until <= Date.now()){
+      submitBtn.disabled = false;
+      return;
+    }
+    submitBtn.disabled = true;
+    rateLimitTimer = setInterval(()=>{
+      const remaining = until - Date.now();
+      if (remaining <= 0){
+        clearInterval(rateLimitTimer);
+        sessionStorage.removeItem('auth_rate_limit_until');
+        submitBtn.disabled = false;
+        setMessage('', false);
+        return;
+      }
+      const mins = Math.floor(remaining / 60000);
+      const secs = Math.floor((remaining % 60000) / 1000);
+      setMessage(`Zu viele Anfragen — bitte in ${mins}m ${secs}s erneut versuchen.`, true);
+    }, 1000);
+  }
+
+  function handleRateLimit(ms){
+    const until = Date.now() + ms;
+    setRateLimitUntil(until);
+    startRateLimitCountdown();
+  }
 
   function setMessage(text, isError){
     messageEl.textContent = text;
@@ -57,6 +97,9 @@
 
   // ensure initial visibility
   updateAvatarVisibility();
+
+  // if a rate-limit cooldown is active from a previous attempt, start countdown
+  startRateLimitCountdown();
 
   switchBtn.addEventListener('click', (e)=>{
     e.preventDefault();
@@ -113,8 +156,18 @@
         // read username + email from reg fields
         const regUsername = document.getElementById('reg_username').value.trim();
         const regEmail = document.getElementById('reg_email').value.trim();
-        const { data, error } = await db.auth.signUp({ email: regEmail, password }, { data: { username: regUsername } });
-        if (error) throw error;
+        // attempt signUp and handle rate-limit errors gracefully
+        const signRes = await db.auth.signUp({ email: regEmail, password, options: { data: { username: regUsername } } });
+        if (signRes.error){
+          const msg = (signRes.error && (signRes.error.message || (signRes.error.error && signRes.error.error.message))) || '';
+          if (msg.toLowerCase().includes('rate')){
+            // email rate limit exceeded
+            handleRateLimit(RATE_LIMIT_MS);
+            return;
+          }
+          throw signRes.error;
+        }
+        const data = signRes.data;
         if (data && data.user){
           // upload avatar if present
           if (avatarFile){
@@ -124,11 +177,21 @@
               if (upErr) console.warn('Avatar upload failed:', upErr.message || upErr);
             } catch(uploadError){ console.warn('Avatar upload exception', uploadError); }
           }
-          // Auto-login after register
-          const loginRes = await db.auth.signInWithPassword({ email, password });
-          if (loginRes.error) throw loginRes.error;
-          setMessage('Registrierung erfolgreich — eingeloggt.', false);
-          showLoggedIn(loginRes.data.user);
+          // Auto-login after register (may fail if email confirmation is required)
+          try {
+            const loginRes = await db.auth.signInWithPassword({ email: regEmail, password });
+            if (loginRes.error) throw loginRes.error;
+            setMessage('Registrierung erfolgreich — eingeloggt.', false);
+            showLoggedIn(loginRes.data.user);
+          } catch (loginErr) {
+            console.warn('Auto-login failed after signUp:', loginErr);
+            const msg = (loginErr && (loginErr.message || loginErr.error && loginErr.error.message)) || '';
+            if (msg.toLowerCase().includes('email not confirmed') || msg.toLowerCase().includes('confirm')) {
+              setMessage('Registrierung abgeschlossen. Bitte bestätige deine E‑Mail per Link.', false);
+            } else {
+              setMessage('Registrierung abgeschlossen. Bitte melde dich an.', false);
+            }
+          }
         } else {
           setMessage('Registrierung abgeschlossen. Bitte prüfen Sie E‑Mail.', false);
         }
@@ -151,30 +214,91 @@
   });
 
   // Show logged-in state and provide logout
-  function showLoggedIn(user){
-    try {
-      form.style.display = 'none';
-    } catch(e){}
+  async function showLoggedIn(user){
+    try { form.style.display = 'none'; } catch(e){}
+
+    // hide the register/login toggles
+    const regFields = document.getElementById('regFields');
+    const loginIdentifier = document.getElementById('loginIdentifier');
+    const authSwitch = document.querySelector('.auth-switch');
+    if (regFields) regFields.style.display = 'none';
+    if (loginIdentifier) loginIdentifier.style.display = 'none';
+    if (authSwitch) authSwitch.style.display = 'none';
+
+      // Always try to get latest current user from Supabase to ensure metadata is present
+      try {
+        const current = await getCurrentUser();
+        if (current) user = current;
+      } catch(e){ console.warn('getCurrentUser failed', e); }
+
     const box = document.getElementById('profileAuthBox') || document.querySelector('.auth-box');
-    const info = document.createElement('div');
-    info.className = 'logged-in-info';
-    info.innerHTML = `<p>Angemeldet als <strong>${user.email || user.user_metadata?.username || 'User'}</strong></p>`;
-    const outBtn = document.createElement('button');
-    outBtn.textContent = 'Logout';
-    outBtn.style.marginTop = '8px';
-    outBtn.addEventListener('click', async ()=>{
+
+    // remove any existing profile view
+    const existing = box.querySelector('.profile-view');
+    if (existing) existing.remove();
+
+    const container = document.createElement('div');
+    container.className = 'profile-view';
+
+    // Logout toggle (top-right small red rounded box that expands on hover)
+    const logoutToggle = document.createElement('button');
+    logoutToggle.className = 'logout-toggle';
+    logoutToggle.setAttribute('aria-label', 'Logout');
+    logoutToggle.innerHTML = '<span class="icon">⎋</span><span class="text">Logout</span>';
+    logoutToggle.addEventListener('click', async ()=>{
       try {
         await logout();
-        info.remove();
-        form.style.display = '';
-        setMessage('Ausgeloggt.', false);
-      } catch(err){
-        console.error('Logout error', err);
-        setMessage('Fehler beim Logout.', true);
-      }
+      } catch(err){ console.error('Logout error', err); }
+      // remove profile view and restore form / switches
+      container.remove();
+      try { form.style.display = ''; } catch(e){}
+      if (regFields) regFields.style.display = 'none';
+      if (loginIdentifier) loginIdentifier.style.display = 'block';
+      if (authSwitch) authSwitch.style.display = 'flex';
+      // restore title and submit button
+      try { document.getElementById('authTitle').textContent = 'Login'; } catch(e){}
+      try { submitBtn.textContent = 'Login'; } catch(e){}
+      mode = 'login';
+      updateAvatarVisibility();
+      setMessage('Ausgeloggt.', false);
     });
-    info.appendChild(outBtn);
-    box.appendChild(info);
+
+    // Determine display username (prefer stored username, else derive from email local-part)
+    const displayName = user?.user_metadata?.username || (user?.email ? user.email.split('@')[0] : null) || 'User';
+    // set profile title to 'Profil'
+    try { document.getElementById('authTitle').textContent = 'Profil'; } catch(e){}
+
+    // Profile avatar (prefer user metadata avatar_url, else use current preview, else initials)
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'profile-avatar';
+    const metaAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.avatar || null;
+    const previewImg = avatarPreview && avatarPreview.querySelector && avatarPreview.querySelector('img') ? avatarPreview.querySelector('img').src : null;
+    if (metaAvatar) {
+      const img = document.createElement('img'); img.src = metaAvatar; img.alt = displayName || 'Avatar'; avatarEl.appendChild(img);
+    } else if (previewImg) {
+      const img = document.createElement('img'); img.src = previewImg; img.alt = displayName || 'Avatar'; avatarEl.appendChild(img);
+    } else {
+      const initials = document.createElement('div'); initials.className = 'avatar-initials';
+      initials.textContent = (displayName && displayName[0]) ? displayName[0].toUpperCase() : 'U';
+      avatarEl.appendChild(initials);
+    }
+
+    // Username centered
+    const usernameEl = document.createElement('div');
+    usernameEl.className = 'profile-username';
+    usernameEl.textContent = displayName;
+
+    // Favorites box (placeholder)
+    const favoritesBox = document.createElement('div');
+    favoritesBox.className = 'favorites-box';
+    favoritesBox.innerHTML = '<h3>Favoriten Fits</h3><div class="favorites-empty">Noch keine Favoriten</div>';
+
+    container.appendChild(logoutToggle);
+    container.appendChild(avatarEl);
+    container.appendChild(usernameEl);
+    container.appendChild(favoritesBox);
+
+    box.appendChild(container);
   }
 
 })();

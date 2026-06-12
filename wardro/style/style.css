@@ -295,6 +295,31 @@ header img{
 .avatar-preview.placeholder{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));}
 .auth-message{margin-top:12px;text-align:center}
 
+/* Logged-in profile view */
+.profile-view{position:relative;padding:36px;display:flex;flex-direction:column;align-items:center;gap:36px;width:100%;max-width:920px;margin:0 auto;min-height:calc(100vh - 10vh - 140px)}
+
+/* Logout toggle pill */
+.logout-toggle{position:absolute;top:12px;right:12px;background:rgba(255,50,50,0.12);border-radius:8px;padding:6px 8px;border:1px solid rgba(255,50,50,0.18);cursor:pointer;display:flex;align-items:center;gap:6px;overflow:hidden;transition:all 220ms ease}
+.logout-toggle .icon{display:inline-block;color:#ff6666;font-size:1.1rem}
+.logout-toggle .text{display:inline-block;color:#fff;font-size:1rem;opacity:0;width:0;white-space:nowrap;transition:all 220ms ease}
+.logout-toggle:hover{background:rgba(255,50,50,0.18);padding:6px 14px}
+.logout-toggle:hover .text{opacity:1;width:auto;margin-left:6px}
+
+/* Big centered avatar */
+.profile-avatar{width:18vh;height:18vh;min-width:110px;min-height:110px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.avatar-initials{font-size:3.2rem;color:#fff}
+
+.profile-username{font-size:2.4rem;color:#fff;text-align:center}
+
+/* Favorites placeholder box */
+.favorites-box{width:100%;max-width:920px;flex:1;border-radius:14px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);padding:22px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:auto}
+.favorites-box h3{margin:0 0 6px 0}
+.favorites-empty{color:rgba(255,255,255,0.5);margin-top:8px}
+
+/* Prevent profile page itself scrolling; allow only favorites-box to scroll */
+.page.page-2 .page-content { overflow: hidden; }
+
 /* logged-in info */
 .logged-in-info{margin-top:12px;text-align:center;color:#fff}
-.logged-in-info button{margin-top:8px;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;cursor:pointer}
+.logged-in-info button{margin-top:8px;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);color:#fff;cursor:pointer; font-size:2rem;}

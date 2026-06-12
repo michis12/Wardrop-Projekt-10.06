@@ -3,8 +3,8 @@
 const SUPABASE_URL = "https://hifunnzmpvlukmaoilyx.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhpZnVubnptcHZsdWttYW9pbHl4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDM4OTUsImV4cCI6MjA5NjcxOTg5NX0.Ul7p1SliKI9JnU-YnDvhmujFytrB0psHQUYYgzU6YwM";
 
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Use the global `supabase` provided by the CDN and create the client
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ──────────────────────────────────────────
 // AUTH
