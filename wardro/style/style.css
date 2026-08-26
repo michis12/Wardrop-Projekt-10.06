@@ -305,25 +305,25 @@ header img{
 }
 
 #bp_head {
-    width: 22vw;
+    width: 19vw;
     height: auto;
     animation: fadeIn 2s ease-in-out;
     transition: all 0.3s ease;
 }
 #bp_torso {
-    width: 40vw;
+    width: 27vw;
     height: auto;
     animation: fadeIn 2s ease-in-out;
     transition: all 0.3s ease;
 }
 #bp_legs {
-    width: 32vw;
+    width: 47vw;
     height: auto;
     animation: fadeIn 2s ease-in-out;
     transition: all 0.3s ease;
 }
 #bp_shoes {
-    width: 36vw;
+    width: 20vw;
     height: auto;
     animation: fadeIn 2s ease-in-out;
     transition: all 0.3s ease;
