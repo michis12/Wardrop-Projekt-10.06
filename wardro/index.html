@@ -40,59 +40,57 @@
         <div class="page page-1 active" id="page-1">
             <div class="page-content">
                 <main>
-                    <img id="bp_1" onclick="bodyTouched(1);" src="media/imgs/menukreis.png" alt="wardro">
+                    <img id="bp_head"  onclick="bodyTouched('head');"  src="media/imgs/menukreis.png" alt="Kopf">
+                    <img id="bp_torso" onclick="bodyTouched('torso');" src="media/imgs/menukreis.png" alt="Torso">
+                    <img id="bp_legs"  onclick="bodyTouched('legs');"  src="media/imgs/menukreis.png" alt="Beine">
+                    <img id="bp_shoes" onclick="bodyTouched('shoes');" src="media/imgs/menukreis.png" alt="Schuhe">
                 </main>
                 <img id="left-btn" src="media/imgs/leftbtn.png" alt="btn">
                 <img id="right-btn" src="media/imgs/rightbtn.png" alt="btn">
             </div>
         </div>
 
-                <!-- Page 2: Profil (Auth UI) -->
-                <div class="page page-2" id="page-2">
-                        <div class="page-content">
-                                
+        <!-- Page 2: Profil (Auth UI) -->
+        <div class="page page-2" id="page-2">
+            <div class="page-content">
+                <main class="auth-page-inline">
+                    <section class="auth-box" id="profileAuthBox">
+                        <h2 id="authTitle">Login</h2>
+                        <form id="authForm">
+                            <div class="avatar-row">
+                                <div id="avatarPreview" class="avatar-preview" title="Profilbild ändern" aria-hidden="true"></div>
+                                <input id="avatarInput" type="file" accept="image/*" capture="user" style="display:none">
+                            </div>
 
-                                <main class="auth-page-inline">
-                                    <section class="auth-box" id="profileAuthBox">
-                                        <h2 id="authTitle">Login</h2>
-                                        <form id="authForm">
-                                            <div class="avatar-row">
-                                                <div id="avatarPreview" class="avatar-preview" title="Profilbild ändern" aria-hidden="true"></div>
-                                                <input id="avatarInput" type="file" accept="image/*" capture="user" style="display:none">
-                                            </div>
+                            <div class="reg-fields" id="regFields" style="display:none">
+                                <label for="reg_username">Benutzername</label>
+                                <input id="reg_username" name="reg_username" type="text" autocomplete="username">
 
-                                                                                        <!-- Registration-only fields (hidden by default) -->
-                                                                                        <div class="reg-fields" id="regFields" style="display:none">
-                                                                                            <label for="reg_username">Benutzername</label>
-                                                                                            <input id="reg_username" name="reg_username" type="text" autocomplete="username">
+                                <label for="reg_email">E‑Mail</label>
+                                <input id="reg_email" name="reg_email" type="email" autocomplete="email">
+                            </div>
 
-                                                                                            <label for="reg_email">E‑Mail</label>
-                                                                                            <input id="reg_email" name="reg_email" type="email" autocomplete="email">
-                                                                                        </div>
+                            <div id="loginIdentifier">
+                                <label for="identifier">Benutzername oder E‑Mail</label>
+                                <input id="identifier" name="identifier" type="text" autocomplete="username">
+                            </div>
 
-                                                                                        <!-- Login identifier (visible by default) -->
-                                                                                        <div id="loginIdentifier">
-                                                                                            <label for="identifier">Benutzername oder E‑Mail</label>
-                                                                                            <input id="identifier" name="identifier" type="text" autocomplete="username">
-                                                                                        </div>
+                            <label for="password">Passwort</label>
+                            <input id="password" name="password" type="password" autocomplete="current-password" required>
 
-                                            <label for="password">Passwort</label>
-                                            <input id="password" name="password" type="password" autocomplete="current-password" required>
+                            <button id="submitBtn" type="submit">Login</button>
+                        </form>
 
-                                            <button id="submitBtn" type="submit">Login</button>
-                                        </form>
-
-                                        <div class="auth-switch">
-                                            <span id="switchText">Noch keinen Account?</span>
-                                            <button id="switchBtn">Registrieren</button>
-                                        </div>
-
-                                        <div id="authMessage" class="auth-message" role="status" aria-live="polite"></div>
-                                    </section>
-                                </main>
-
+                        <div class="auth-switch">
+                            <span id="switchText">Noch keinen Account?</span>
+                            <button id="switchBtn">Registrieren</button>
                         </div>
-                </div>
+
+                        <div id="authMessage" class="auth-message" role="status" aria-live="polite"></div>
+                    </section>
+                </main>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->

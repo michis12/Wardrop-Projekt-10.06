@@ -1,13 +1,12 @@
 // Page Navigation System
-let currentPage = 1; // Start with main page (middle)
+let currentPage = 1;
 let touchStartX = 0;
 let touchEndX = 0;
 
 const pages = document.querySelectorAll('.page');
 const dots = document.querySelectorAll('.dot');
-const SWIPE_THRESHOLD = 50; // Minimum distance for swipe
+const SWIPE_THRESHOLD = 50;
 
-// Initialize dots
 function updateDots() {
     dots.forEach((dot, index) => {
         dot.classList.remove('active');
@@ -17,18 +16,13 @@ function updateDots() {
     });
 }
 
-// Navigate to specific page
 function goToPage(pageIndex) {
     if (pageIndex < 0 || pageIndex >= pages.length) return;
     
-    const direction = pageIndex > currentPage ? 'next' : 'prev';
-    
-    // Remove all directional classes
     pages.forEach(page => {
         page.classList.remove('next', 'prev', 'active');
     });
     
-    // Set direction class for all pages except the current one
     pages.forEach((page, index) => {
         if (index !== pageIndex) {
             if (index > pageIndex) {
@@ -45,7 +39,6 @@ function goToPage(pageIndex) {
     updateDots();
 }
 
-// Touch/Swipe handling
 document.addEventListener('touchstart', (e) => {
     touchStartX = e.changedTouches[0].screenX;
 }, false);
@@ -57,26 +50,21 @@ document.addEventListener('touchend', (e) => {
 
 function handleSwipe() {
     const diff = touchStartX - touchEndX;
-    
     if (Math.abs(diff) > SWIPE_THRESHOLD) {
         if (diff > 0) {
-            // Swipe left - go to next page
             goToPage(currentPage + 1);
         } else {
-            // Swipe right - go to previous page
             goToPage(currentPage - 1);
         }
     }
 }
 
-// Dot click handling
 dots.forEach((dot, index) => {
     dot.addEventListener('click', () => {
         goToPage(index);
     });
 });
 
-// Keyboard navigation (optional - for testing)
 document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') {
         goToPage(currentPage - 1);
@@ -85,50 +73,75 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
-    // Disable transitions during initial setup
     pages.forEach(page => {
         page.style.transition = 'none';
     });
     
-    // Set initial page positions
     goToPage(currentPage);
     
-    // Re-enable transitions after initial setup
     setTimeout(() => {
         pages.forEach(page => {
             page.style.transition = 'left 0.4s ease-in-out';
         });
     }, 50);
 });
-function bodyTouched(pageIndex) {
-    const bp = document.getElementById('bp_1');
-    const leftBtn = document.getElementById('left-btn');
+
+// ── Wardrobe: je Teil eine Liste von Bild-URLs ──
+const wardrobe = { head: [], torso: [], legs: [], shoes: [] };
+const wardrobeIndex = { head: 0, torso: 0, legs: 0, shoes: 0 };
+
+let activePart = null;
+
+function bodyTouched(part) {
+    const leftBtn  = document.getElementById('left-btn');
     const rightBtn = document.getElementById('right-btn');
-    
-    // Toggle active state
-    bp.classList.toggle('active');
-    leftBtn.classList.toggle('show');
-    rightBtn.classList.toggle('show');
+
+    // Gleiches Teil nochmal → Pfeile togglen
+    if (activePart === part) {
+        leftBtn.classList.toggle('show');
+        rightBtn.classList.toggle('show');
+        document.getElementById('bp_' + part).classList.toggle('active');
+        if (!leftBtn.classList.contains('show')) activePart = null;
+        return;
+    }
+
+    // Altes Teil deaktivieren
+    if (activePart) {
+        document.getElementById('bp_' + activePart).classList.remove('active');
+    }
+
+    activePart = part;
+    document.getElementById('bp_' + part).classList.add('active');
+    leftBtn.classList.add('show');
+    rightBtn.classList.add('show');
+}
+
+function prevItem() {
+    if (!activePart || wardrobe[activePart].length === 0) return;
+    wardrobeIndex[activePart] = (wardrobeIndex[activePart] - 1 + wardrobe[activePart].length) % wardrobe[activePart].length;
+    document.getElementById('bp_' + activePart).src = wardrobe[activePart][wardrobeIndex[activePart]];
+}
+
+function nextItem() {
+    if (!activePart || wardrobe[activePart].length === 0) return;
+    wardrobeIndex[activePart] = (wardrobeIndex[activePart] + 1) % wardrobe[activePart].length;
+    document.getElementById('bp_' + activePart).src = wardrobe[activePart][wardrobeIndex[activePart]];
 }
 
 // ==================== UPLOAD & IMAGE PROCESSING ====================
 
-// Initialize upload functionality
 document.addEventListener('DOMContentLoaded', () => {
     const uploadBox = document.getElementById('uploadBox');
     const imageInput = document.getElementById('imageInput');
     const cameraBtn = document.getElementById('cameraBtn');
     const galleryBtn = document.getElementById('galleryBtn');
     
-    // Click on box opens gallery by default
     uploadBox.addEventListener('click', () => {
         if (imageInput.hasAttribute('capture')) imageInput.removeAttribute('capture');
         imageInput.click();
     });
     
-    // Camera button: set capture then open
     if (cameraBtn) {
         cameraBtn.addEventListener('click', () => {
             imageInput.setAttribute('capture', 'environment');
@@ -136,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Gallery button: ensure no capture and open
     if (galleryBtn) {
         galleryBtn.addEventListener('click', () => {
             if (imageInput.hasAttribute('capture')) imageInput.removeAttribute('capture');
@@ -144,19 +156,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle file selection
     imageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             handleImageUpload(file);
         }
-        // Reset capture so subsequent picks default to gallery
         if (imageInput.hasAttribute('capture')) imageInput.removeAttribute('capture');
-        // Clear value to allow re-selecting same file later
         imageInput.value = '';
     });
     
-    // Drag and drop
     uploadBox.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadBox.style.borderColor = 'rgba(255, 255, 255, 0.8)';
@@ -176,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Load TensorFlow model
 let segmenter = null;
 
 async function initSegmentation() {
@@ -195,20 +202,14 @@ async function initSegmentation() {
     }
 }
 
-// Main image processing function
 async function handleImageUpload(file) {
     const reader = new FileReader();
     
     reader.onload = async (e) => {
         const img = new Image();
         img.onload = async () => {
-            // Initialize segmentation model
             await initSegmentation();
-            
-            // Process the image
             const processedCanvas = await removeBackground(img);
-            
-            // Show preview
             showPreview(processedCanvas);
         };
         img.src = e.target.result;
@@ -217,7 +218,6 @@ async function handleImageUpload(file) {
     reader.readAsDataURL(file);
 }
 
-// Remove background and segment image
 async function removeBackground(img) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -227,12 +227,10 @@ async function removeBackground(img) {
     ctx.drawImage(img, 0, 0);
     
     if (!segmenter) {
-        // Fallback: just return the original image if model not loaded
         return canvas;
     }
     
     try {
-        // Segment the image
         const segmentation = await segmenter.segmentPeople(canvas);
         
         if (segmentation.length === 0) {
@@ -240,60 +238,49 @@ async function removeBackground(img) {
             return canvas;
         }
         
-        // Create mask for the foreground (person)
         const foregroundColor = { r: 0, g: 0, b: 0, a: 0 };
         const backgroundColor = { r: 0, g: 0, b: 0, a: 0 };
         
         const mask = await bodySegmentation.toBinaryMask(segmentation, foregroundColor, backgroundColor);
         
-        // Create output canvas with transparency
         const outputCanvas = document.createElement('canvas');
         outputCanvas.width = canvas.width;
         outputCanvas.height = canvas.height;
         const outputCtx = outputCanvas.getContext('2d');
         
-        // Draw original image
         outputCtx.drawImage(canvas, 0, 0);
         
-        // Apply mask
         const imageData = outputCtx.getImageData(0, 0, outputCanvas.width, outputCanvas.height);
         const data = imageData.data;
         const maskData = mask.data;
         
         for (let i = 0; i < maskData.length; i++) {
             if (maskData[i] === 0) {
-                // Transparent where background (i * 4 because RGBA)
                 data[i * 4 + 3] = 0;
             }
         }
         
         outputCtx.putImageData(imageData, 0, 0);
-        
         return outputCanvas;
     } catch (error) {
         console.error('Error in segmentation:', error);
-        return canvas; // Return original if error
+        return canvas;
     }
 }
 
-// Show preview of processed image
 function showPreview(canvas) {
     const uploadBox = document.getElementById('uploadBox');
     const preview = document.getElementById('preview');
     const previewImg = document.getElementById('processedImage');
     
-    // Hide upload box, show preview
     uploadBox.style.display = 'none';
     preview.style.display = 'block';
     
-    // Create image from canvas
     canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         previewImg.src = url;
-        // ensure the preview container is empty and the image is inside it
         preview.innerHTML = '';
         preview.appendChild(previewImg);
-        // force sizing and scaling to fit the box
         previewImg.style.display = 'block';
         previewImg.style.width = '100%';
         previewImg.style.height = '100%';
