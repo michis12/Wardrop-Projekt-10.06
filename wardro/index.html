@@ -4,11 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WARDRO</title>
-    <link rel="stylesheet" href="style/style.css?v=2">
-    <script src="./javaScript/db.js?v=2" defer></script>
-    <script src="./javaScript/ai.js?v=2" defer></script>
-    <script src="./javaScript/script.js?v=2" defer></script>
+    <link rel="stylesheet" href="style/style.css?v=3">
+    <script src="./javaScript/db.js?v=3" defer></script>
+    <script src="./javaScript/ai.js?v=3" defer></script>
+    <script src="./javaScript/script.js?v=3" defer></script>
     <link rel="apple-touch-icon" href="media/imgs/appIcon.png">
+    <script>
+        // Auto-Update: Die Homescreen-App am iPhone hält alte Versionen fest.
+        // Bei jedem Öffnen wird version.json frisch geholt; ist sie neuer, lädt die App neu.
+        // Bei einem Update: APP_VERSION, version.json und alle ?v=… gleich hochzählen.
+        (function () {
+            var APP_VERSION = '3';
+            function checkForUpdate() {
+                fetch('version.json?t=' + Date.now(), { cache: 'no-store' })
+                    .then(function (r) { return r.json(); })
+                    .then(function (d) {
+                        if (!d.version || d.version === APP_VERSION) return;
+                        try {
+                            if (sessionStorage.getItem('wardro_update') === d.version) return; // keine Endlosschleife
+                            sessionStorage.setItem('wardro_update', d.version);
+                        } catch (e) {}
+                        location.replace(location.pathname + '?v=' + d.version);
+                    })
+                    .catch(function () {});
+            }
+            checkForUpdate();
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible') checkForUpdate();
+            });
+        })();
+    </script>
 </head>
 <body>
     <!-- Header -->
